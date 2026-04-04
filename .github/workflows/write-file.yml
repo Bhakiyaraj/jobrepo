@@ -1,0 +1,36 @@
+name: Write Text File
+
+on:
+  workflow_dispatch:
+    inputs:
+      filename:
+        description: 'Name of the file to create'
+        required: true
+        default: 'output.txt'
+      content:
+        description: 'Content to write to the file'
+        required: true
+        default: 'Hello, World!'
+
+jobs:
+  write-file:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Write the text file
+        run: |
+          mkdir -p output
+          echo "${{ github.event.inputs.content }}" > "output/${{ github.event.inputs.filename }}"
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Add/update file: ${{ github.event.inputs.filename }}"
+          git push
